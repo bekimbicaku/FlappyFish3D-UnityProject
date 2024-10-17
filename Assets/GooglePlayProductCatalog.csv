@@ -1,0 +1,4 @@
+Product ID,Published State,Purchase Type,Auto Translate,Locale; Title; Description,Auto Fill Prices,Price,Pricing Template ID
+com.bicakugames.flappyfish3d.gems50,published,managed_by_android,false,en_US;50 Gems;Gives the player 50 Gems,true,1990000,
+com.bicakugames.flappyfish3d.gems100,published,managed_by_android,false,en_US;100 Gems;Gives the player 100 Gems,true,4990000,
+com.bicakugames.flappyfish3d.gems500,published,managed_by_android,false,en_US;500 Gems;Gives the player 500 Gems,true,9990000,
