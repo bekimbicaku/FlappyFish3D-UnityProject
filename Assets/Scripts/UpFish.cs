@@ -7,20 +7,21 @@ using UnityEngine;
 public class UpFish : MonoBehaviour
 {
     [SerializeField] public float motorForce;
-    // Start is called before the first frame update
-    void Start()
+    private Rigidbody cachedRigidbody;
+
+    void Awake()
     {
-        
+        cachedRigidbody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetComponent<Rigidbody>().AddForce(Vector3.up * motorForce * Time.deltaTime);
+        cachedRigidbody.AddForce(Vector3.up * motorForce * Time.deltaTime);
     }
     public void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "UpZone")
+        if (other.CompareTag("UpZone"))
         {
             Destroy(gameObject);
 

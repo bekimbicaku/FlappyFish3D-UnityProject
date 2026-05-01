@@ -15,21 +15,21 @@ public class DelfinSpeed : MonoBehaviour
 
     public string Tagged;
     public string Untagged;
+    private Rigidbody cachedRigidbody;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        cachedRigidbody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetComponent<Rigidbody>().AddForce(Vector3.forward * motorForce * Time.deltaTime);
+        cachedRigidbody.AddForce(Vector3.forward * motorForce * Time.deltaTime);
     }
     public void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Player")
+        if (other.CompareTag("Player"))
         {
             playerBody.SetActive(false);
             StartCoroutine(respawnMenu());

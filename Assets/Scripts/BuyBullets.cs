@@ -6,15 +6,14 @@ using TMPro;
 
 public class BuyBullets : MonoBehaviour
 {
+    private const string CoinsKey = "NumberOfCoins";
+    private const string BulletsKey = "Bullets";
     public Button buyButton;
     public Button shootButton;
     public Button respawnButton;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private bool lastBuyInteractable;
+    private bool lastRespawnInteractable;
+    private bool lastShootInteractable;
 
     // Update is called once per frame
     void Update()
@@ -25,32 +24,28 @@ public class BuyBullets : MonoBehaviour
 
     public void UpdateUI()
     { 
-       
-        
-        if (10 <= PlayerPrefs.GetInt("NumberOfCoins", 0))
+        int coins = PlayerPrefs.GetInt(CoinsKey, 0);
+        int bullets = PlayerPrefs.GetInt(BulletsKey, 0);
+
+        bool canBuyOrRespawn = coins >= 10;
+        bool canShoot = bullets >= 1;
+
+        if (lastBuyInteractable != canBuyOrRespawn)
         {
-           buyButton.interactable = true;
-        }
-        else
-        {
-           buyButton.interactable = false;
-        }
-        if (10 <= PlayerPrefs.GetInt("NumberOfCoins", 0))
-        {
-            respawnButton.interactable = true;
-        }
-        else
-        {
-            respawnButton.interactable = false;
+            buyButton.interactable = canBuyOrRespawn;
+            lastBuyInteractable = canBuyOrRespawn;
         }
 
-        if (1 <= PlayerPrefs.GetInt("Bullets", 0))
+        if (lastRespawnInteractable != canBuyOrRespawn)
         {
-            shootButton.interactable = true;
+            respawnButton.interactable = canBuyOrRespawn;
+            lastRespawnInteractable = canBuyOrRespawn;
         }
-        else
+
+        if (lastShootInteractable != canShoot)
         {
-            shootButton.interactable = false;
+            shootButton.interactable = canShoot;
+            lastShootInteractable = canShoot;
         }
 
     }

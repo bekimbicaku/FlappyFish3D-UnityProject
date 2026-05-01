@@ -9,9 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/FF3D.unity
     guid: 08717afe781d8cc44a5c38b1db299b60
   m_configObjects:
+    com.unity.adaptivePerformance.basic.provider_settings: {fileID: 11400000, guid: 656cc53a5864edd4bb1029ab769f71dc,
+      type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: af6767c0409948f4d8b54bd1d731ee84,
       type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000,
       guid: a264c06fc02c95d4dae16cd2f569167e, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000,
       guid: 91f45cdd396f538479382384fb201aa6, type: 2}
+  m_UseUCBPForAssetBundles: 0

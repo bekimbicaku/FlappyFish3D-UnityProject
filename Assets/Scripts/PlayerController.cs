@@ -10,7 +10,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    
+    private const string CoinsKey = "NumberOfCoins";
+    private const string BulletsKey = "Bullets";
+    private const string HighscoreKey = "highscore";
 
     public Transform bulletSpawnPoint;
     public GameObject bulletPrefab;
@@ -29,6 +31,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity;
     [SerializeField] private ForceMode forceMode;
     private Rigidbody playerRB;
+    private Animator netAnimator;
     private float XRange = -2;
     private float Range = -4;
     public GameObject player;
@@ -63,15 +66,19 @@ public class PlayerController : MonoBehaviour
     public GameObject Starplayer;
     public GameObject Dolphinplayer;
     public GameObject Blueplayer;
+    private int lastCoinsTextValue = int.MinValue;
+    private int lastBulletsTextValue = int.MinValue;
+    private int lastDistanceTextValue = int.MinValue;
 
 
 
     private void Awake()
     {
-        HSText2.text = "HIGHSCORE: " + PlayerPrefs.GetInt("highscore").ToString();
-        HSText.text = "HIGHSCORE: " + PlayerPrefs.GetInt("highscore").ToString();
-        numberOfCoins = PlayerPrefs.GetInt("NumberOfCoins", 0);
-        bullets = PlayerPrefs.GetInt("Bullets", 0);
+        int highscore = PlayerPrefs.GetInt(HighscoreKey);
+        HSText2.text = "HIGHSCORE: " + highscore.ToString();
+        HSText.text = "HIGHSCORE: " + highscore.ToString();
+        numberOfCoins = PlayerPrefs.GetInt(CoinsKey, 0);
+        bullets = PlayerPrefs.GetInt(BulletsKey, 0);
     }
 
     // Start is called before the first frame update
@@ -79,6 +86,7 @@ public class PlayerController : MonoBehaviour
     {
         Time.timeScale = 0;
         playerRB = GetComponent<Rigidbody>();
+        netAnimator = Net.GetComponent<Animator>();
         InvokeRepeating("distance", 0, 1 / transform.position.z);
 
     }
@@ -86,10 +94,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        coinsText.text = " " + PlayerPrefs.GetInt("NumberOfCoins", 0).ToString();
-        bulletsText.text = bullets.ToString();
-        coinsText2.text = " " + PlayerPrefs.GetInt("NumberOfCoins", 0).ToString();
-        GetComponent<Rigidbody>().AddForce(Vector3.forward * motorForce * Time.deltaTime);
+        numberOfCoins = PlayerPrefs.GetInt(CoinsKey, numberOfCoins);
+        bullets = PlayerPrefs.GetInt(BulletsKey, bullets);
+        UpdateHudTexts();
+        playerRB.AddForce(Vector3.forward * motorForce * Time.deltaTime);
         if (Input.GetMouseButtonDown(0))
         {
             SoundManagerScript.PlaySound("up");
@@ -203,7 +211,11 @@ public class PlayerController : MonoBehaviour
         {
             distanceunit = distanceunit + 0;
         }
-        distancemoved.text = " " + distanceunit.ToString();
+        if (lastDistanceTextValue != distanceunit)
+        {
+            distancemoved.text = " " + distanceunit.ToString();
+            lastDistanceTextValue = distanceunit;
+        }
 
     }
     public void RevivePlayer()
@@ -213,7 +225,7 @@ public class PlayerController : MonoBehaviour
         
         revivePanel.SetActive(false);
         panel.SetActive(true);
-        PlayerPrefs.SetInt("NumberOfCoins", PlayerPrefs.GetInt("NumberOfCoins", 0) - 10);
+        PlayerPrefs.SetInt(CoinsKey, PlayerPrefs.GetInt(CoinsKey, 0) - 10);
         numberOfCoins = numberOfCoins - 10;
         motorForce = 125f;
         force = 7f;
@@ -240,14 +252,14 @@ public class PlayerController : MonoBehaviour
     }
     public void Buy()
     {
-        PlayerPrefs.SetInt("Bullets", PlayerPrefs.GetInt("Bullets", 0) + 1);
+        PlayerPrefs.SetInt(BulletsKey, PlayerPrefs.GetInt(BulletsKey, 0) + 1);
         bullets = bullets + 1;
-        PlayerPrefs.SetInt("NumberOfCoins", PlayerPrefs.GetInt("NumberOfCoins", 0) - 10);
+        PlayerPrefs.SetInt(CoinsKey, PlayerPrefs.GetInt(CoinsKey, 0) - 10);
         numberOfCoins = numberOfCoins - 10 ;
     }
     public void Buy2()
     {
-        PlayerPrefs.SetInt("Bullets", PlayerPrefs.GetInt("Bullets", 0) + 1);
+        PlayerPrefs.SetInt(BulletsKey, PlayerPrefs.GetInt(BulletsKey, 0) + 1);
         bullets = bullets + 1;
         
     }
@@ -257,55 +269,55 @@ public class PlayerController : MonoBehaviour
     }
     public void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Speed")
+        if (other.CompareTag("Speed"))
         {          
             motorForce = motorForce + 80f;           
         }
-        if (other.tag == "Slow")
+        if (other.CompareTag("Slow"))
         {
             motorForce = motorForce - 40f;
         }
-        if (other.tag == "Increase")
+        if (other.CompareTag("Increase"))
         {
-            PlayerPrefs.SetInt("NumberOfCoins", PlayerPrefs.GetInt("NumberOfCoins", 0) + 5);
+            PlayerPrefs.SetInt(CoinsKey, PlayerPrefs.GetInt(CoinsKey, 0) + 5);
             numberOfCoins = numberOfCoins + 5;
         }
-        if (other.tag == "Broke")
+        if (other.CompareTag("Broke"))
         {
-            PlayerPrefs.SetInt("NumberOfCoins", PlayerPrefs.GetInt("NumberOfCoins", 0) - 5);
+            PlayerPrefs.SetInt(CoinsKey, PlayerPrefs.GetInt(CoinsKey, 0) - 5);
             numberOfCoins = numberOfCoins - 5;
         }
-        if (other.tag == "Coral")
+        if (other.CompareTag("Coral"))
         {
 
             //motorForce = 0f;
             //force = 10f;
             //gravity = 0f;
             currentText.text = "CURRENT SCORE: " + distanceunit.ToString();
-            if (distanceunit > PlayerPrefs.GetInt("highscore"))
+            if (distanceunit > PlayerPrefs.GetInt(HighscoreKey))
             {
                 
-                PlayerPrefs.SetInt("highscore", distanceunit);
-                HSText.text = "NEW HIGHSCORE: " + PlayerPrefs.GetInt("highscore").ToString();
+                PlayerPrefs.SetInt(HighscoreKey, distanceunit);
+                HSText.text = "NEW HIGHSCORE: " + PlayerPrefs.GetInt(HighscoreKey).ToString();
                 HSText.color = Color.green;
             }
            
 
         }
-        if (other.tag == "Net")
+        if (other.CompareTag("Net"))
         {
             currentText2.text = "CURRENT SCORE: " + distanceunit.ToString();
-            Net.GetComponent<Animator>().Play("Net");
+            netAnimator.Play("Net");
             //player.GetComponent<Animator>().Play("Catch");
             StartCoroutine(NetCatch());
             motorForce = 0f;
             gravity = 0f;
             force = 0f;
-            if (distanceunit > PlayerPrefs.GetInt("highscore"))
+            if (distanceunit > PlayerPrefs.GetInt(HighscoreKey))
             {
 
-                PlayerPrefs.SetInt("highscore", distanceunit);
-                HSText2.text = "NEW HIGHSCORE: " + PlayerPrefs.GetInt("highscore").ToString();
+                PlayerPrefs.SetInt(HighscoreKey, distanceunit);
+                HSText2.text = "NEW HIGHSCORE: " + PlayerPrefs.GetInt(HighscoreKey).ToString();
                 HSText2.color = Color.green;
             }
 
@@ -313,22 +325,23 @@ public class PlayerController : MonoBehaviour
     }
     public void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Speed")
+        if (other.CompareTag("Speed"))
         {            
             motorForce = motorForce - 80f;
         }
-        if (other.tag == "Slow")
+        if (other.CompareTag("Slow"))
         {
             motorForce = motorForce + 80f;
         }
     }
     public void shoot()
     {
-        PlayerPrefs.SetInt("Bullets", PlayerPrefs.GetInt("Bullets", 0) - 1);
+        PlayerPrefs.SetInt(BulletsKey, PlayerPrefs.GetInt(BulletsKey, 0) - 1);
         bullets = bullets - 1;
         SoundManagerScript.PlaySound("shoot");
         var bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-        bullet.GetComponent<Rigidbody>().velocity = bulletSpawnPoint.forward * Time.deltaTime * bulletSpeed;
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+        bulletRb.linearVelocity = bulletSpawnPoint.forward * Time.deltaTime * bulletSpeed;
     }
     public void Pause()
     {
@@ -359,5 +372,22 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(11f);
         GameOverPanel.SetActive(true);
+    }
+
+    private void UpdateHudTexts()
+    {
+        if (lastCoinsTextValue != numberOfCoins)
+        {
+            string coinsValue = " " + numberOfCoins.ToString();
+            coinsText.text = coinsValue;
+            coinsText2.text = coinsValue;
+            lastCoinsTextValue = numberOfCoins;
+        }
+
+        if (lastBulletsTextValue != bullets)
+        {
+            bulletsText.text = bullets.ToString();
+            lastBulletsTextValue = bullets;
+        }
     }
 }

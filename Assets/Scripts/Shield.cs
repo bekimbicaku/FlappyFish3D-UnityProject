@@ -16,6 +16,7 @@ public class Shield : MonoBehaviour
 
     float currentTime = 0f;
     float startingTime = 9f;
+    private int lastShownSeconds = int.MinValue;
 
     [SerializeField] TextMeshProUGUI countdownText;
     void Start()
@@ -24,16 +25,23 @@ public class Shield : MonoBehaviour
     }
     void Update()
     {
-        countdownText.text = currentTime.ToString("0");
         if (currentTime <= 0)
         {
             currentTime = 0;
         }
+
+        int shownSeconds = Mathf.CeilToInt(currentTime);
+        if (lastShownSeconds != shownSeconds)
+        {
+            countdownText.text = currentTime.ToString("0");
+            lastShownSeconds = shownSeconds;
+        }
+
         currentTime -= 1 * Time.deltaTime;
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "CloseShield")
+        if (other.CompareTag("CloseShield"))
         {
             SoundManagerScript.PlaySound("shield");
             currentTime = startingTime;

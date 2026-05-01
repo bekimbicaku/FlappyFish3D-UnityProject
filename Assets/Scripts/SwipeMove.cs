@@ -5,18 +5,30 @@ using UnityEngine;
 public class SwipeMove : MonoBehaviour
 {
     public GameObject player;
+    private Transform playerTransform;
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
 
+    private void Awake()
+    {
+        playerTransform = player.transform;
+    }
+
     private void Update()
     {
-        if(Input.touchCount > 0.9 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Input.touchCount <= 0)
         {
-            startTouchPosition = Input.GetTouch(0).position;
+            return;
         }
-        if (Input.touchCount > 0.9 && Input.GetTouch(0).phase == TouchPhase.Ended)
+
+        Touch touch = Input.GetTouch(0);
+        if (touch.phase == TouchPhase.Began)
         {
-            endTouchPosition = Input.GetTouch(0).position;
+            startTouchPosition = touch.position;
+        }
+        if (touch.phase == TouchPhase.Ended)
+        {
+            endTouchPosition = touch.position;
             if (endTouchPosition.x < startTouchPosition.x)
             {
                 Right();
@@ -31,12 +43,12 @@ public class SwipeMove : MonoBehaviour
     private void Left()
     {
         SoundManagerScript.PlaySound("swipe");
-        player.transform.position = new Vector3(player.transform.position.x + 2, player.transform.position.y, player.transform.position.z - 1);
+        playerTransform.position = new Vector3(playerTransform.position.x + 2, playerTransform.position.y, playerTransform.position.z - 1);
 
     }
     private void Right()
     {
         SoundManagerScript.PlaySound("swipe");
-        player.transform.position = new Vector3(player.transform.position.x - 2, player.transform.position.y, player.transform.position.z - 1);
+        playerTransform.position = new Vector3(playerTransform.position.x - 2, playerTransform.position.y, playerTransform.position.z - 1);
     }
 }
